@@ -1,12 +1,10 @@
 services:
   - type: web
     name: bizmaster-api
-    runtime: php
-    buildCommand: chmod +x scripts/build.sh && ./scripts/build.sh
-    startCommand: php artisan serve --host=0.0.0.0 --port=$PORT
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
     envVars:
-      - key: PORT
-        value: "10000"
       - key: APP_NAME
         value: BizMaster
       - key: APP_ENV
