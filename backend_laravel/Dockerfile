@@ -20,8 +20,15 @@ WORKDIR /var/www/html
 # Copy everything
 COPY . .
 
-# Install PHP dependencies
-RUN composer install --no-dev --optimize-autoloader --no-interaction
+# Create a dummy .env so artisan commands work during build
+RUN cp .env.example .env
+
+# Install PHP dependencies (--no-scripts to avoid artisan errors during build)
+RUN composer install --no-dev --optimize-autoloader --no-interaction --no-scripts \
+    && composer dump-autoload --optimize
+
+# Remove dummy .env (real env vars come from Render at runtime)
+RUN rm -f .env
 
 # Set permissions
 RUN chown -R www-data:www-data storage bootstrap/cache \
