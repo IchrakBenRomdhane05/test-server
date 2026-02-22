@@ -22,23 +22,24 @@ COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
 WORKDIR /var/www/html
 
-# Copy application
+# Copy composer files first for better Docker layer caching
+COPY composer.json composer.lock ./
+RUN composer install --no-dev --optimize-autoloader --no-interaction --no-scripts
+
+# Copy rest of the application
 COPY . .
 
-# Install dependencies
-RUN composer install --no-dev --optimize-autoloader --no-interaction
+# Regenerate autoload
+RUN composer dump-autoload --optimize
 
 # Set permissions
 RUN chown -R www-data:www-data storage bootstrap/cache \
     && chmod -R 775 storage bootstrap/cache
 
-# Use PORT env var from Render (default 10000)
-RUN sed -i 's/Listen 80/Listen ${PORT}/' /etc/apache2/ports.conf \
-    && sed -i 's/:80/:${PORT}/' /etc/apache2/sites-available/000-default.conf
-
 EXPOSE 10000
 
-# Entrypoint: run migrations then start Apache
+# Copy and set entrypoint
 COPY scripts/entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
+
 CMD ["/entrypoint.sh"]
