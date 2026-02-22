@@ -1,0 +1,71 @@
+services:
+  - type: web
+    name: bizmaster-api
+    runtime: php
+    buildCommand: chmod +x scripts/build.sh && ./scripts/build.sh
+    startCommand: php artisan serve --host=0.0.0.0 --port=$PORT
+    envVars:
+      - key: PORT
+        value: "10000"
+      - key: APP_NAME
+        value: BizMaster
+      - key: APP_ENV
+        value: production
+      - key: APP_DEBUG
+        value: "false"
+      - key: APP_KEY
+        generateValue: true
+      - key: APP_URL
+        value: https://bizmaster-api.onrender.com
+      - key: LOG_CHANNEL
+        value: stderr
+      - key: DB_CONNECTION
+        value: pgsql
+      - key: DB_HOST
+        fromDatabase:
+          name: bizmaster-db
+          property: host
+      - key: DB_PORT
+        fromDatabase:
+          name: bizmaster-db
+          property: port
+      - key: DB_DATABASE
+        fromDatabase:
+          name: bizmaster-db
+          property: database
+      - key: DB_USERNAME
+        fromDatabase:
+          name: bizmaster-db
+          property: user
+      - key: DB_PASSWORD
+        fromDatabase:
+          name: bizmaster-db
+          property: password
+      - key: SESSION_DRIVER
+        value: cookie
+      - key: CACHE_STORE
+        value: file
+      - key: QUEUE_CONNECTION
+        value: sync
+      - key: MAIL_MAILER
+        sync: false
+      - key: MAIL_HOST
+        sync: false
+      - key: MAIL_PORT
+        sync: false
+      - key: MAIL_USERNAME
+        sync: false
+      - key: MAIL_PASSWORD
+        sync: false
+      - key: MAIL_ENCRYPTION
+        sync: false
+      - key: MAIL_FROM_ADDRESS
+        sync: false
+      - key: MAIL_FROM_NAME
+        sync: false
+
+databases:
+  - name: bizmaster-db
+    plan: free
+    databaseName: biz_master
+    user: bizmaster_user
